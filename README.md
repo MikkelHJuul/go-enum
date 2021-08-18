@@ -39,3 +39,15 @@ Also you may wish to use unexported "guarded" types of you wish to remove the ab
 - build using ast
 
   And inline "enums" in each method
+
+
+## The go enum?
+Until we get:
+```
+type MyEnum enum {
+     ...fields
+} {
+    ENUM1: {...},
+    ENUM2: {...},
+}
+```
