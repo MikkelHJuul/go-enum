@@ -43,7 +43,7 @@ Also you may wish to use unexported "guarded" types of you wish to remove the ab
 
 ## The go enum?
 Until we get:
-```
+```go
 type MyEnum enum {
      ...fields
 } {
