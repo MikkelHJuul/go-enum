@@ -1,0 +1,77 @@
+package {{ .PackageName }}
+
+import (
+    "bufio"
+    "html/template"
+    "os"
+    "path/filepath"
+    "reflect"
+    "strings"
+    "testing"
+)
+
+type Named interface {
+	Name() string
+}
+
+type EnumType struct {
+	Name, Type string
+}
+
+type SerializationObj struct {
+	PackageName string
+	EnumTypeName    EnumType
+	Enums       []EnumVal
+}
+
+type EnumVal struct {
+	Name string
+	Type string
+	Ordinal    int
+}
+
+const packageName = "{{ .PackageName }}"
+
+func {{ .TestName }}(t *testing.T) {
+	fn := Values
+	var enumType EnumType
+	enumTypeName := reflect.TypeOf(fn).Out(0).Elem().Name()
+	if enumTypeName == "" {
+		//assumes `interface{}`
+		enumType = EnumType{"interface{}", "IFace"}
+	} else {
+		enumType = EnumType{enumTypeName, enumTypeName}
+	}
+	var enums []EnumVal
+	for i ,enum := range Values() {
+		enum := EnumVal{
+			Name:    enum.(Named).Name(),
+			Type:    reflect.TypeOf(enum).Name(),
+			Ordinal: i,
+		}
+		enums = append(enums, enum)
+	}
+	ser := SerializationObj{
+		PackageName: packageName,
+		EnumTypeName:    enumType,
+		Enums:       enums,
+	}
+	templ, err := template.ParseFiles("go-enum.enum.tmpl")
+	if err != nil {
+		t.Errorf("could not parse template file: %v", err)
+	}
+	fileName := "{{ .FileName }}"
+	fileName = strings.ReplaceAll(fileName, "*", enumType.Name)
+	path, err := filepath.Abs(fileName)
+	_ = os.Remove(path)
+	f, err := os.Create(path)
+	w := bufio.NewWriter(f)
+	err = templ.Execute(w, ser)
+	if err != nil {
+		t.Errorf("error building template: %v", err)
+	}
+	err = w.Flush()
+	if err != nil {
+		t.Errorf("error writing to file: %v", err)
+	}
+}
