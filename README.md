@@ -34,6 +34,8 @@ Also you may wish to use unexported "guarded" types of you wish to remove the ab
 
 ## future changes
 - Remove the interface `enum.Named`
+
   The package should rely on a tag to figure which struct item should describe the enum's name. Build a small name-enum for modifiers: (camelCase,PascalCase,SCREAMING_SNAKE_CASE, etc.) - although allowing full control via the `Name` method is nice.  It requires runtime to work (whence the test-injection)
 - build using ast
+
   And inline "enums" in each method
